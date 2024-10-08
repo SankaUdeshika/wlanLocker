@@ -14,14 +14,15 @@ import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Link, router } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
-const lgooPath = require("./assets/LOGO.png");
+const lgooPath = require("../assets/LOGO.png");
 export default function App() {
   // fonts
   const [loaded, error] = useFonts({
-    lockerBold: require("./assets/fonts/LockerBold.ttf"),
-    lockerLights: require("./assets/fonts/LockerLight.ttf"),
+    lockerBold: require("../assets/fonts/LockerBold.ttf"),
+    lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
 
   const [getEmail, setEmail] = useState("");
@@ -39,7 +40,7 @@ export default function App() {
 
   return (
     <View style={stylessheet.container}>
-      <StatusBar style="hide" />
+      <StatusBar style="hide" backgroundColor="black" />
       <View style={stylessheet.view1}>
         <Image source={lgooPath} style={stylessheet.LogoImage} />
         <Text style={stylessheet.LogoText}>OurWlanLocker</Text>
@@ -92,7 +93,10 @@ export default function App() {
                 if (jsonObject.success) {
                   let user = jsonObject.user;
                   await AsyncStorage.setItem("user", JSON.stringify(user));
-                  Alert.alert("SignIn",jsonObject.message);
+                  Alert.alert("success", jsonObject.message);
+                  router.push("/home")
+                } else {
+                  Alert.alert("Error", jsonObject.message);
                 }
               } else {
                 Alert.alert("Something Wrong Please Try again later");
@@ -102,7 +106,11 @@ export default function App() {
             <Text style={stylessheet.buttonText}>LoGiN</Text>
           </Pressable>
         </View>
-        <Pressable>
+        <Pressable
+          onPress={() => {
+            router.push("/signup");
+          }}
+        >
           <Text style={stylessheet.normalText}>Or? Create Account</Text>
         </Pressable>
       </View>
@@ -148,7 +156,7 @@ const stylessheet = StyleSheet.create({
     width: "100%",
     color: "white",
     fontSize: 15,
-    fontFamily: "lockerLights",
+    fontFamily: "lockerLight",
   },
   TextInput: {
     width: 350,

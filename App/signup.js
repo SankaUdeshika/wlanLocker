@@ -14,15 +14,15 @@ import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { Picker } from "@react-native-picker/picker";
-import { FlashList } from "@shopify/flash-list";
+import { Link, router } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
-const lgooPath = require("./assets/LOGO.png");
+const lgooPath = require("../assets/LOGO.png");
 export default function App() {
   // fonts
   const [loaded, error] = useFonts({
-    lockerBold: require("./assets/fonts/LockerBold.ttf"),
-    lockerLights: require("./assets/fonts/LockerLight.ttf"),
+    lockerBold: require("../assets/fonts/LockerBold.ttf"),
+    lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
   const [getEmail, setEmail] = useState("");
   const [getName, setName] = useState("");
@@ -63,7 +63,7 @@ export default function App() {
 
   return (
     <View style={stylessheet.container}>
-      <StatusBar style="hide" />
+      <StatusBar style="hide" backgroundColor="black" />
       <View style={stylessheet.view1}>
         <Image source={lgooPath} style={stylessheet.LogoImage} />
         <Text style={stylessheet.LogoText}>OurWlanLocker</Text>
@@ -151,7 +151,11 @@ export default function App() {
                 if (response.ok) {
                   let jsonResponse = await response.json();
                   console.log(jsonResponse.message);
-                  Alert.alert(jsonResponse.message);
+                  if (jsonResponse.success) {
+                    Alert.alert("Success", jsonResponse.message);
+                  } else {
+                    Alert.alert("Error", jsonResponse.message);
+                  }
                 } else {
                   Alert.alert("NO");
                 }
@@ -161,7 +165,11 @@ export default function App() {
             </Text>
           </Pressable>
         </View>
-        <Pressable>
+        <Pressable
+          onPress={() => {
+            router.back("/index");
+          }}
+        >
           <Text style={stylessheet.normalText2}>
             Already Have Account? Signin
           </Text>
@@ -173,7 +181,7 @@ export default function App() {
 
 const stylessheet = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
     backgroundColor: "black",
     color: "white",
     alignItems: "center",
@@ -209,13 +217,13 @@ const stylessheet = StyleSheet.create({
     width: "100%",
     color: "white",
     fontSize: 35,
-    fontFamily: "lockerLights",
+    fontFamily: "lockerLight",
   },
   normalText2: {
     width: "100%",
     color: "white",
     fontSize: 15,
-    fontFamily: "lockerLights",
+    fontFamily: "lockerLight",
   },
   TextInput: {
     width: 350,

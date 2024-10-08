@@ -19,14 +19,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlashList } from "@shopify/flash-list";
 
 SplashScreen.preventAutoHideAsync();
-const lgooPath = require("./assets/LOGO.png");
-const LockImagePath = require("./assets/Lock.png");
+const lgooPath = require("../assets/LOGO.png");
+const LockImagePath = require("../assets/Lock.png");
 
 export default function App() {
   // fonts
   const [loaded, error] = useFonts({
-    lockerBold: require("./assets/fonts/LockerBold.ttf"),
-    lockerLight: require("./assets/fonts/LockerLight.ttf"),
+    lockerBold: require("../assets/fonts/LockerBold.ttf"),
+    lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
   const [getHomeList, setHomeList] = useState([]);
 

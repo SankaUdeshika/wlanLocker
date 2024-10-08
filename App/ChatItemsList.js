@@ -15,14 +15,14 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 
 SplashScreen.preventAutoHideAsync();
-const lgooPath = require("./assets/LOGO.png");
-const LockImagePath = require("./assets/Lock.png");
+const lgooPath = require("../assets/LOGO.png");
+const LockImagePath = require("../assets/Lock.png");
 
 export default function App() {
   // fonts
   const [loaded, error] = useFonts({
-    lockerBold: require("./assets/fonts/LockerBold.ttf"),
-    lockerLights: require("./assets/fonts/LockerLight.ttf"),
+    lockerBold: require("../assets/fonts/LockerBold.ttf"),
+    lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
   useEffect(() => {
     if (loaded || error) {
@@ -36,7 +36,7 @@ export default function App() {
 
   return (
     <View style={stylessheet.container}>
-      <StatusBar style="hide" />
+      <StatusBar style="hide" backgroundColor="black" />
 
       <View style={stylessheet.body}>
         <LinearGradient
