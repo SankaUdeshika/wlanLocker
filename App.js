@@ -28,26 +28,7 @@ export default function App() {
     lockerBold: require("./assets/fonts/LockerBold.ttf"),
     lockerLight: require("./assets/fonts/LockerLight.ttf"),
   });
-  const [getHomeList, setHomeList] = useState([
-    {
-      homeID: 1,
-      homeLockStatus: 1,
-      homeMemberCounter: 3,
-      homeName: "Tiron's House",
-    },
-    {
-      homeID: 2,
-      homeLockStatus: 2,
-      homeMemberCounter: 2,
-      homeName: "Gayan's House",
-    },
-    {
-      homeID: 3,
-      homeLockStatus: 1,
-      homeMemberCounter: 1,
-      homeName: "Kausahlya's's House",
-    },
-  ]);
+  const [getHomeList, setHomeList] = useState([]);
 
   useEffect(() => {
     if (loaded || error) {
@@ -71,7 +52,7 @@ export default function App() {
         let jsonObject = ResponseObject.HomeArray;
         console.log(jsonObject);
 
-        // setHomeList(jsonObject);
+        setHomeList(jsonObject);
       } else {
         Alert.alert("Something Worng, Please Try again later");
       }
