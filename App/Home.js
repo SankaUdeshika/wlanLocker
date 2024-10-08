@@ -3,6 +3,7 @@ import {
   Alert,
   Button,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +15,7 @@ import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlashList } from "@shopify/flash-list";
 
 SplashScreen.preventAutoHideAsync();
@@ -26,6 +28,27 @@ export default function App() {
     lockerBold: require("./assets/fonts/LockerBold.ttf"),
     lockerLight: require("./assets/fonts/LockerLight.ttf"),
   });
+  const [getHomeList, setHomeList] = useState([
+    {
+      homeID: 1,
+      homeLockStatus: 1,
+      homeMemberCounter: 3,
+      homeName: "Tiron's House",
+    },
+    {
+      homeID: 2,
+      homeLockStatus: 2,
+      homeMemberCounter: 2,
+      homeName: "Gayan's House",
+    },
+    {
+      homeID: 3,
+      homeLockStatus: 1,
+      homeMemberCounter: 1,
+      homeName: "Kausahlya's's House",
+    },
+  ]);
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
@@ -34,12 +57,21 @@ export default function App() {
 
   useEffect(() => {
     async function LoadHomes() {
+      let userJson = await AsyncStorage.getItem("user");
+      let userObject = JSON.parse(userJson);
+
       let response = await fetch(
-        process.env.EXPO_PUBLIC_URL + "/wlanlocker/LoadHomesData"
+        process.env.EXPO_PUBLIC_URL +
+          "/wlanlocker/LoadHomesData?user_id=" +
+          userObject.id
       );
 
       if (response.ok) {
-        Alert.alert("OK");
+        let ResponseObject = await response.json();
+        let jsonObject = ResponseObject.HomeArray;
+        console.log(jsonObject);
+
+        // setHomeList(jsonObject);
       } else {
         Alert.alert("Something Worng, Please Try again later");
       }
@@ -47,13 +79,12 @@ export default function App() {
     LoadHomes();
   }, []);
 
-  if (!loaded && error) {
+  if (!loaded && !error) {
     return null;
   }
 
   return (
     <View style={stylessheet.container}>
-      <StatusBar style="hide" />
       <View style={stylessheet.header}>
         <View style={stylessheet.mainHeader}>
           <View style={stylessheet.profileCover}>
@@ -74,78 +105,63 @@ export default function App() {
           <Image source={LockImagePath} style={{ width: 100, height: 100 }} />
           <Text style={stylessheet.WelcomeText}>Locked</Text>
         </LinearGradient>
-        <View style={stylessheet.ChatCategory}>
-          <LinearGradient
-            colors={["#1B1B1B", "black"]}
-            style={stylessheet.LockStatus}
-          >
-            <View style={stylessheet.HomeList}>
+      </View>
+      <ScrollView style={stylessheet.scrolView}>
+        <FlashList
+          data={getHomeList}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => {
+                console.log(item.homeID);
+              }}
+            >
               <View style={stylessheet.homeRow}>
                 <View style={stylessheet.imageCover}>
                   <Image source={lgooPath} style={stylessheet.HomeImage} />
                 </View>
                 <View style={stylessheet.HomeDetails}>
-                  <Text style={stylessheet.HomeOwnerName}>Tiron's Home</Text>
+                  <Text style={stylessheet.HomeOwnerName}>{item.homeName}</Text>
                   <View style={stylessheet.HomeStatus}>
                     <View style={{ marginRight: 10 }}>
-                      <Text style={stylessheet.lockStatus}>Unlocked</Text>
-                    </View>
-                    <View style={{ marginRight: 10 }}>
-                      <FontAwesome6
-                        name="person"
-                        style={{ color: "white", fontSize: 15 }}
-                      />
-                      <Text style={{ color: "white" }}>6</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-              <View style={stylessheet.homeRow}>
-                <View style={stylessheet.imageCover}>
-                  <Image source={lgooPath} style={stylessheet.HomeImage} />
-                </View>
-                <View style={stylessheet.HomeDetails}>
-                  <Text style={stylessheet.HomeOwnerName}>Tiron's Home</Text>
-                  <View style={stylessheet.HomeStatus}>
-                    <View style={{ marginRight: 10 }}>
-                      <Text style={stylessheet.lockStatus}>Unlocked</Text>
-                    </View>
-                    <View style={{ marginRight: 10 }}>
-                      <FontAwesome6
-                        name="person"
-                        style={{ color: "white", fontSize: 15 }}
-                      />
-                      <Text style={{ color: "white" }}>6</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
-              <View style={stylessheet.homeRow}>
-                <View style={stylessheet.imageCover}>
-                  <Image source={lgooPath} style={stylessheet.HomeImage} />
-                </View>
-                <View style={stylessheet.HomeDetails}>
-                  <Text style={stylessheet.HomeOwnerName}>Tiron's Home</Text>
-                  <View style={stylessheet.HomeStatus}>
-                    <View style={{ marginRight: 10 }}>
-                      <Text style={stylessheet.lockStatus}>Unlocked</Text>
+                      {item.homeLockStatus == 1 ? (
+                        <Text
+                          style={
+                            item.homeLockStatus == 1
+                              ? stylessheet.lockStatus
+                              : stylessheet.NotlockStatus
+                          }
+                        >
+                          Unlocked
+                        </Text>
+                      ) : (
+                        <Text
+                          style={
+                            item.homeLockStatus == 1
+                              ? stylessheet.lockStatus
+                              : stylessheet.NotlockStatus
+                          }
+                        >
+                          Locked
+                        </Text>
+                      )}
                     </View>
                     <View style={{ marginRight: 10, justifyContent: "center" }}>
                       <FontAwesome6
                         name="person"
                         style={{ color: "white", fontSize: 15 }}
                       />
-                      <Text style={{ color: "white" }}>6</Text>
+                      <Text style={{ color: "white" }}>
+                        {item.homeMemberCounter}
+                      </Text>
                     </View>
                   </View>
                 </View>
               </View>
-            </View>
-          </LinearGradient>
-        </View>
-      </View>
+            </Pressable>
+          )}
+          estimatedItemSize={200}
+        />
+      </ScrollView>
       <View style={stylessheet.navigation}>
         <Pressable style={stylessheet.mainPressableButton}>
           <Text style={stylessheet.WelcomeText}>Lock the Gate</Text>
@@ -159,49 +175,22 @@ const stylessheet = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    color: "white",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
   },
   header: {
-    flex: 1,
-    width: "100%",
-  },
-  body: {
-    flex: 4,
-    backgroundColor: "white",
-    width: "100%",
-    flexDirection: "column",
-  },
-  navigation: {
-    flex: 1,
-    backgroundColor: "black",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: 50,
   },
   mainHeader: {
-    width: "100%",
-    height: "100%",
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
   },
   profileCover: {
-    width: "100%",
-    height: "100%",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 20,
   },
   profileDetails: {
-    width: "100%",
     flex: 2,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
+    marginTop: 20,
   },
   WelcomeText: {
     justifyContent: "center",
@@ -217,34 +206,8 @@ const stylessheet = StyleSheet.create({
     fontSize: 14,
     fontFamily: "lockerLight",
   },
-  LockStatus: {
-    backgroundColor: "yellow",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
-  },
-  ChatCategory: {
-    backgroundColor: "red",
-    flex: 2,
-  },
-  LinearGradientView: {
-    width: "100%",
-    height: "100%",
-  },
-  mainPressableButton: {
-    width: "60%",
-    height: 50,
-    paddingLeft: 50,
-    paddingRight: 50,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: "white",
-  },
-  HomeList: {
-    width: "100%",
-    flexDirection: "column",
+  scrolView: {
+    backgroundColor: "black",
   },
   homeRow: {
     flexDirection: "row",
@@ -272,7 +235,7 @@ const stylessheet = StyleSheet.create({
     flexDirection: "row",
     marginTop: 5,
   },
-  lockStatus: {
+  NotlockStatus: {
     fontSize: 13,
     color: "lightgreen",
     textShadowColor: "lightgreen",
@@ -284,5 +247,40 @@ const stylessheet = StyleSheet.create({
     shadowColor: "lightgreen",
     shadowOffset: { width: 4, height: 5 }, // 3rd shadow
     shadowRadius: 6,
+  },
+  lockStatus: {
+    fontSize: 13,
+    color: "red",
+    textShadowColor: "red",
+    textShadowOffset: { width: 2, height: 2 }, // 1st shadow
+    textShadowRadius: 5,
+    textShadowColor: "red",
+    shadowOffset: { width: 3, height: 3 }, // 2nd shadow
+    shadowRadius: 6,
+    shadowColor: "red",
+    shadowOffset: { width: 4, height: 5 }, // 3rd shadow
+    shadowRadius: 6,
+  },
+  LockStatus: {
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  navigation: {
+    flex: 1,
+    backgroundColor: "black",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mainPressableButton: {
+    width: "60%",
+    height: 50,
+    paddingLeft: 50,
+    paddingRight: 50,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderStyle: "solid",
+    borderColor: "white",
   },
 });
