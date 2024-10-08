@@ -17,6 +17,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlashList } from "@shopify/flash-list";
+import { router } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 const lgooPath = require("../assets/LOGO.png");
@@ -66,6 +67,8 @@ export default function App() {
 
   return (
     <View style={stylessheet.container}>
+      <StatusBar style="hide" backgroundColor="black" />
+
       <View style={stylessheet.header}>
         <View style={stylessheet.mainHeader}>
           <View style={stylessheet.profileCover}>
@@ -93,7 +96,7 @@ export default function App() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => {
-                console.log(item.homeID);
+                router.push("/ChatItemsList")
               }}
             >
               <View style={stylessheet.homeRow}>
