@@ -30,12 +30,34 @@ export default function App() {
     lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
   const [getHomeList, setHomeList] = useState([]);
+  const [getUserLockStatus, setUserLockStatus] = useState("");
 
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
+
+  useEffect(() => {
+    async function LoadLockUserStatus() {
+      let userJson = await AsyncStorage.getItem("user");
+      let userObject = JSON.parse(userJson);
+
+      let response = await fetch(
+        process.env.EXPO_PUBLIC_URL +
+          "/wlanlocker/GetUserLockerStatus?user_id=" +
+          userObject.id
+      );
+
+      if (response.ok) {
+        let resoponse = await response.json();
+        setUserLockStatus(resoponse.UserHomeLockStatus);
+      } else {
+        Alert.alert("Something Worng, Please Try again later");
+      }
+    }
+    LoadLockUserStatus();
+  }, []);
 
   useEffect(() => {
     async function LoadHomes() {
@@ -95,7 +117,7 @@ export default function App() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => {
-                router.push({pathname:"/ChatItemsList", params:item});
+                router.push({ pathname: "/ChatItemsList", params: item });
               }}
             >
               <View style={stylessheet.homeRow}>
@@ -114,7 +136,7 @@ export default function App() {
                               : stylessheet.NotlockStatus
                           }
                         >
-                          Unlocked
+                          Locked
                         </Text>
                       ) : (
                         <Text
@@ -124,7 +146,7 @@ export default function App() {
                               : stylessheet.NotlockStatus
                           }
                         >
-                          Locked
+                          Unlocked
                         </Text>
                       )}
                     </View>
@@ -146,9 +168,51 @@ export default function App() {
         />
       </ScrollView>
       <View style={stylessheet.navigation}>
-        <Pressable style={stylessheet.mainPressableButton}>
-          <Text style={stylessheet.WelcomeText}>Lock the Gate</Text>
-        </Pressable>
+        {getUserLockStatus == 2 ? (
+          <Pressable
+            style={stylessheet.mainPressableButton}
+            onPress={async () => {
+              let UserObject = await AsyncStorage.getItem("user");
+              let user = JSON.parse(UserObject);
+
+              let response = await fetch(
+                process.env.EXPO_PUBLIC_URL +
+                  "/wlanlocker/LockerActions?action=Lock&user_id=" +
+                  user.id
+              );
+
+              if (response.ok) {
+                router.replace("/Home");
+              } else {
+                Alert.alert("NO");
+              }
+            }}
+          >
+            <Text style={stylessheet.WelcomeText}>Lock </Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={stylessheet.mainPressableButton}
+            onPress={async () => {
+              let UserObject = await AsyncStorage.getItem("user");
+              let user = JSON.parse(UserObject);
+
+              let response = await fetch(
+                process.env.EXPO_PUBLIC_URL +
+                  "/wlanlocker/LockerActions?action=UnLock&user_id=" +
+                  user.id
+              );
+
+              if (response.ok) {
+                router.replace("/Home");
+              } else {
+                Alert.alert("NO");
+              }
+            }}
+          >
+            <Text style={stylessheet.WelcomeText}>UnLock</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );

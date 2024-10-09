@@ -39,7 +39,7 @@ export default function App() {
       try {
         let userJson = await AsyncStorage.getItem("user");
         if (userJson != null) {
-          router.replace("/home");
+          router.push("/Home");
         }
       } catch (error) {
         Alert.alert(error);
@@ -109,7 +109,7 @@ export default function App() {
                   let user = jsonObject.user;
                   await AsyncStorage.setItem("user", JSON.stringify(user));
                   Alert.alert("success", jsonObject.message);
-                  router.push("/home")
+                  router.push("/Home")
                 } else {
                   Alert.alert("Error", jsonObject.message);
                 }
