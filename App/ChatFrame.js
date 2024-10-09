@@ -16,11 +16,12 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { sortRoutes } from "expo-router/build/sortRoutes";
 
 SplashScreen.preventAutoHideAsync();
 export default function chat() {
   // get params
-  const params = useLocalSearchParams();
+  const item = useLocalSearchParams();
   //   console.log(parameters.other_user_id);
 
   // sotre ChatArray
@@ -43,7 +44,6 @@ export default function chat() {
 
   // fetch Chat Array from server
   useEffect(() => {
-    console.log(params.user_ID);
     async function fetchChatArray() {
       let userJson = await AsyncStorage.getItem("user");
       let user = JSON.parse(userJson);
@@ -52,7 +52,7 @@ export default function chat() {
           "//wlanlocker/LoadConversations?logged_user_id=" +
           user.id +
           "&other_user_id=" +
-          params.user_ID
+          item.user_ID
       );
       if (response.ok) {
         let chatArray = await response.json();
@@ -62,7 +62,7 @@ export default function chat() {
     }
     fetchChatArray();
     setInterval(() => {
-      // fetchChatArray();
+      fetchChatArray();
     }, 5000);
   }, []);
 
@@ -74,7 +74,7 @@ export default function chat() {
     <LinearGradient colors={["black", "gray"]} style={stylesheet.view1}>
       <StatusBar hidden={true} />
       <View style={stylesheet.view2}>
-        {/* <View style={stylesheet.view3}>
+        <View style={stylesheet.view3}>
           {item.avatar_image_found == "true" ? (
             <Image
               style={stylesheet.image1}
@@ -86,13 +86,13 @@ export default function chat() {
               {item.other_user_avatar_letters}
             </Text>
           )}
-        </View> */}
-        {/* <View>
+        </View>
+        <View>
           <Text style={stylesheet.text2}>{item.other_user_name}</Text>
           <Text style={stylesheet.text3}>
             {item.other_user_status == 1 ? "Online" : "Offline"}
           </Text>
-        </View> */}
+        </View>
       </View>
 
       <View style={stylesheet.center_View}>
@@ -138,23 +138,26 @@ export default function chat() {
               let userJson = await AsyncStorage.getItem("user");
               let user = JSON.parse(userJson);
 
+              console.log(item.user_ID);
+
               let response = await fetch(
-                "http://192.168.8.129:8080/Smart_Chat/SendChat?logged_user_id=" +
+                process.env.EXPO_PUBLIC_URL +
+                  "/wlanlocker//SendMessage?logged_user_id=" +
                   user.id +
                   "&other_user_id=" +
-                  item.otherUser_id +
+                  item.user_ID +
                   "&message=" +
                   getChatText
               );
 
-              if (response.ok) {
-                let json = await response.json();
+                if (response.ok) {
+                  let json = await response.json();
 
-                if (json.success) {
-                  console.log("Message sent");
-                  setChatText("");
+                  if (json.success) {
+                    console.log("Message sent");
+                    setChatText("");
+                  }
                 }
-              }
             }
           }}
         >
