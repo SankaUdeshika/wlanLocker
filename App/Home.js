@@ -24,6 +24,10 @@ const lgooPath = require("../assets/LOGO.png");
 const LockImagePath = require("../assets/Lock.png");
 const UnLockImagePath = require("../assets/UnLock.png");
 
+
+const home = require("../assets/1home.png");
+
+
 export default function App() {
   // fonts
   const [loaded, error] = useFonts({
@@ -155,7 +159,7 @@ export default function App() {
             >
               <View style={stylessheet.homeRow}>
                 <View style={stylessheet.imageCover}>
-                  <Image source={lgooPath} style={stylessheet.HomeImage} />
+                  <Image source={home} style={stylessheet.HomeImage} />
                 </View>
                 <View style={stylessheet.HomeDetails}>
                   <Text style={stylessheet.HomeOwnerName}>{item.homeName}</Text>

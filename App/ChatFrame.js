@@ -74,19 +74,6 @@ export default function chat() {
     <LinearGradient colors={["black", "gray"]} style={stylesheet.view1}>
       <StatusBar hidden={true} />
       <View style={stylesheet.view2}>
-        <View style={stylesheet.view3}>
-          {item.avatar_image_found == "true" ? (
-            <Image
-              style={stylesheet.image1}
-              source={""}
-              contentFit={"contain"}
-            />
-          ) : (
-            <Text style={stylesheet.text1}>
-              {item.other_user_avatar_letters}
-            </Text>
-          )}
-        </View>
         <View>
           <Text style={stylesheet.text2}>{item.other_user_name}</Text>
           <Text style={stylesheet.text3}>
@@ -150,14 +137,14 @@ export default function chat() {
                   getChatText
               );
 
-                if (response.ok) {
-                  let json = await response.json();
+              if (response.ok) {
+                let json = await response.json();
 
-                  if (json.success) {
-                    console.log("Message sent");
-                    setChatText("");
-                  }
+                if (json.success) {
+                  console.log("Message sent");
+                  setChatText("");
                 }
+              }
             }
           }}
         >
@@ -223,9 +210,12 @@ const stylesheet = StyleSheet.create({
   },
   text2: {
     fontSize: 22,
+    color: "white",
   },
   text3: {
     fontSize: 16,
+    color: "Black",
+    fontWeight: "bold",
   },
   view6: {
     flexDirection: "row",
@@ -249,9 +239,11 @@ const stylesheet = StyleSheet.create({
     borderRadius: 10,
     borderStyle: "solid",
     borderWidth: 1,
+    borderColor: "white",
     fontSize: 20,
     flex: 1,
     paddingStart: 10,
+    fontWeight: "bold",
   },
   pressable1: {
     backgroundColor: "lightblue",

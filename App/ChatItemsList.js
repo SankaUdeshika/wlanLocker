@@ -9,8 +9,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
-const lgooPath = require("../assets/LOGO.png");
-const LockImagePath = require("../assets/Lock.png");
+const lgooPath = require("../assets/user.png");
+const LockImagePath = require("../assets/1home.png");
 
 export default function App() {
   const item = useLocalSearchParams();
