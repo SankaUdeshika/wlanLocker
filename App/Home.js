@@ -22,6 +22,7 @@ import { router } from "expo-router";
 SplashScreen.preventAutoHideAsync();
 const lgooPath = require("../assets/LOGO.png");
 const LockImagePath = require("../assets/Lock.png");
+const UnLockImagePath = require("../assets/UnLock.png");
 
 export default function App() {
   // fonts
@@ -31,6 +32,7 @@ export default function App() {
   });
   const [getHomeList, setHomeList] = useState([]);
   const [getUserLockStatus, setUserLockStatus] = useState("");
+  const [getMainLockStatus, setMainLockStatus] = useState("");
 
   useEffect(() => {
     if (loaded || error) {
@@ -57,6 +59,24 @@ export default function App() {
       }
     }
     LoadLockUserStatus();
+  }, []);
+
+  useEffect(() => {
+    async function LoadMainLocker() {
+      let response = await fetch(
+        process.env.EXPO_PUBLIC_URL + "/wlanlocker/CheckMainStatus"
+      );
+      if (response.ok) {
+        let resoponse = await response.json();
+        setMainLockStatus(resoponse.lockStatus);
+      } else {
+        Alert.alert("Something Worng, Please Try again later");
+      }
+    }
+    LoadMainLocker();
+    setInterval(() => {
+      LoadMainLocker();
+    }, 5000);
   }, []);
 
   useEffect(() => {
@@ -107,8 +127,19 @@ export default function App() {
           colors={["black", "#1B1B1B"]}
           style={stylessheet.LockStatus}
         >
-          <Image source={LockImagePath} style={{ width: 100, height: 100 }} />
-          <Text style={stylessheet.WelcomeText}>Locked</Text>
+          {getMainLockStatus == 1 ? (
+            <Image source={LockImagePath} style={{ width: 100, height: 100 }} />
+          ) : (
+            <Image
+              source={UnLockImagePath}
+              style={{ width: 100, height: 100 }}
+            />
+          )}
+          {getMainLockStatus == 1 ? (
+            <Text style={stylessheet.WelcomeText}>Locked</Text>
+          ) : (
+            <Text style={stylessheet.WelcomeText}>UnLocked</Text>
+          )}
         </LinearGradient>
       </View>
       <ScrollView style={stylessheet.scrolView}>
