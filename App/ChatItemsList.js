@@ -1,16 +1,11 @@
 import { StatusBar } from "expo-status-bar";
-import {
-  Alert,
-  Text,
-  View,
-  StyleSheet,
-} from "react-native";
+import { Alert, Text, View, StyleSheet, Pressable } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
@@ -20,7 +15,7 @@ const LockImagePath = require("../assets/Lock.png");
 export default function App() {
   const item = useLocalSearchParams();
   const [getChatBox, setChatBox] = useState([]);
-  
+
   // Fonts
   const [loaded, error] = useFonts({
     lockerBold: require("../assets/fonts/LockerBold.ttf"),
@@ -76,33 +71,42 @@ export default function App() {
     <View style={stylessheet.container}>
       <StatusBar style="hide" backgroundColor="black" />
       <View style={stylessheet.body}>
-        <LinearGradient colors={["black", "#1B1B1B"]} style={stylessheet.LockStatus}>
+        <LinearGradient
+          colors={["black", "#1B1B1B"]}
+          style={stylessheet.LockStatus}
+        >
           <Image source={LockImagePath} style={{ width: 100, height: 100 }} />
           <Text style={stylessheet.WelcomeText}>{item.homeName} Members</Text>
           {getChatBox.map((chatItem, index) => (
-            <View key={index} style={stylessheet.homeRow}>
-              <View style={stylessheet.imageCover}>
-                <Image source={lgooPath} style={stylessheet.HomeImage} />
-              </View>
-              <View style={stylessheet.HomeDetails}>
-                <Text style={stylessheet.ChatName}>{chatItem.userName}</Text>
-                <View style={stylessheet.HomeStatus}>
-                  <Text style={stylessheet.lockStatus}>
-                    {chatItem.lastMessage}
-                  </Text>
+            <Pressable
+              onPress={() => {
+                router.push({pathname:"/ChatFrame", params:chatItem});
+                // console.log(chatItem.user_ID);
+              }}
+            >
+              <View key={index} style={stylessheet.homeRow}>
+                <View style={stylessheet.imageCover}>
+                  <Image source={lgooPath} style={stylessheet.HomeImage} />
                 </View>
-                <View style={stylessheet.chatDate}>
-                  <Text style={{ color: "gray" }}>{chatItem.dateTime}</Text>
+                <View style={stylessheet.HomeDetails}>
+                  <Text style={stylessheet.ChatName}>{chatItem.userName}</Text>
+                  <View style={stylessheet.HomeStatus}>
+                    <Text style={stylessheet.lockStatus}>
+                      {chatItem.lastMessage}
+                    </Text>
+                  </View>
+                  <View style={stylessheet.chatDate}>
+                    <Text style={{ color: "gray" }}>{chatItem.dateTime}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            </Pressable>
           ))}
         </LinearGradient>
       </View>
     </View>
   );
 }
-
 
 const stylessheet = StyleSheet.create({
   container: {

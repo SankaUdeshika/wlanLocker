@@ -34,6 +34,21 @@ export default function App() {
     }
   }, [loaded, error]);
 
+  useEffect(() => {
+    async function checkuserINAsyncStorage() {
+      try {
+        let userJson = await AsyncStorage.getItem("user");
+        if (userJson != null) {
+          router.replace("/home");
+        }
+      } catch (error) {
+        Alert.alert(error);
+        console.log(error);
+      }
+    }
+    checkuserINAsyncStorage();
+  }, []);
+  
   if (!loaded && error) {
     return null;
   }
