@@ -51,7 +51,6 @@ export default function App() {
       if (response.ok) {
         let ResponseObject = await response.json();
         let jsonObject = ResponseObject.HomeArray;
-        console.log(jsonObject);
 
         setHomeList(jsonObject);
       } else {
@@ -96,7 +95,7 @@ export default function App() {
           renderItem={({ item }) => (
             <Pressable
               onPress={() => {
-                router.push("/ChatItemsList")
+                router.push({pathname:"/ChatItemsList", params:item});
               }}
             >
               <View style={stylessheet.homeRow}>

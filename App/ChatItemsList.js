@@ -1,34 +1,72 @@
 import { StatusBar } from "expo-status-bar";
 import {
-  Button,
-  Pressable,
-  StyleSheet,
+  Alert,
   Text,
-  TextInput,
   View,
+  StyleSheet,
 } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { FontAwesome6 } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 const lgooPath = require("../assets/LOGO.png");
 const LockImagePath = require("../assets/Lock.png");
 
 export default function App() {
-  // fonts
+  const item = useLocalSearchParams();
+  const [getChatBox, setChatBox] = useState([]);
+  
+  // Fonts
   const [loaded, error] = useFonts({
     lockerBold: require("../assets/fonts/LockerBold.ttf"),
     lockerLight: require("../assets/fonts/LockerLight.ttf"),
   });
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
+
+  useEffect(() => {
+    async function loadHomeChats() {
+      try {
+        let jsonuserObject = await AsyncStorage.getItem("user");
+        let UserObject = JSON.parse(jsonuserObject);
+
+        let response = await fetch(
+          process.env.EXPO_PUBLIC_URL +
+            "/wlanlocker/LoadHomesChats?homeID=" +
+            item.homeID +
+            "&loggedUser_id=" +
+            UserObject.id
+        );
+
+        if (response.ok) {
+          let chatResponse = await response.json();
+
+          if (chatResponse.success) {
+            // Set the chat array to state
+            setChatBox(chatResponse.ChatArray);
+            console.log("Chat data loaded:", chatResponse.ChatArray);
+          } else {
+            Alert.alert("Error", chatResponse.message);
+          }
+        } else {
+          Alert.alert("Something went wrong, Please Try again later");
+        }
+      } catch (error) {
+        console.log("Error fetching chat data:", error);
+      }
+    }
+
+    loadHomeChats();
+  }, []);
 
   if (!loaded && error) {
     return null;
@@ -37,78 +75,34 @@ export default function App() {
   return (
     <View style={stylessheet.container}>
       <StatusBar style="hide" backgroundColor="black" />
-
       <View style={stylessheet.body}>
-        <LinearGradient
-          colors={["black", "#1B1B1B"]}
-          style={stylessheet.LockStatus}
-        >
+        <LinearGradient colors={["black", "#1B1B1B"]} style={stylessheet.LockStatus}>
           <Image source={LockImagePath} style={{ width: 100, height: 100 }} />
-          <Text style={stylessheet.WelcomeText}>Tiron's Home Members</Text>
-
-          <View style={stylessheet.homeRow}>
-            <View style={stylessheet.imageCover}>
-              <Image source={lgooPath} style={stylessheet.HomeImage} />
-            </View>
-            <View style={stylessheet.HomeDetails}>
-              <Text style={stylessheet.ChatName}>Sanka Udeshika</Text>
-              <View style={stylessheet.HomeStatus}>
-                <View style={{ marginRight: 10 }}>
+          <Text style={stylessheet.WelcomeText}>{item.homeName} Members</Text>
+          {getChatBox.map((chatItem, index) => (
+            <View key={index} style={stylessheet.homeRow}>
+              <View style={stylessheet.imageCover}>
+                <Image source={lgooPath} style={stylessheet.HomeImage} />
+              </View>
+              <View style={stylessheet.HomeDetails}>
+                <Text style={stylessheet.ChatName}>{chatItem.userName}</Text>
+                <View style={stylessheet.HomeStatus}>
                   <Text style={stylessheet.lockStatus}>
-                    Hello! this is Text Message
+                    {chatItem.lastMessage}
                   </Text>
                 </View>
-              </View>
-              <View style={stylessheet.chatDate}>
-                <Text style={{color:"gray"}}>sunday 26 ;dasd</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={stylessheet.homeRow}>
-            <View style={stylessheet.imageCover}>
-              <Image source={lgooPath} style={stylessheet.HomeImage} />
-            </View>
-            <View style={stylessheet.HomeDetails}>
-              <Text style={stylessheet.ChatName}>Sanka Udeshika</Text>
-              <View style={stylessheet.HomeStatus}>
-                <View style={{ marginRight: 10 }}>
-                  <Text style={stylessheet.lockStatus}>
-                    Hello! this is Text Message
-                  </Text>
+                <View style={stylessheet.chatDate}>
+                  <Text style={{ color: "gray" }}>{chatItem.dateTime}</Text>
                 </View>
               </View>
-              <View style={stylessheet.chatDate}>
-                <Text style={{color:"gray"}}>sunday 26 ;dasd</Text>
-              </View>
             </View>
-          </View>
-
-          <View style={stylessheet.homeRow}>
-            <View style={stylessheet.imageCover}>
-              <Image source={lgooPath} style={stylessheet.HomeImage} />
-            </View>
-            <View style={stylessheet.HomeDetails}>
-              <Text style={stylessheet.ChatName}>Sanka Udeshika</Text>
-              <View style={stylessheet.HomeStatus}>
-                <View style={{ marginRight: 10 }}>
-                  <Text style={stylessheet.lockStatus}>
-                    Hello! this is Text Message
-                  </Text>
-                </View>
-              </View>
-              <View style={stylessheet.chatDate}>
-                <Text style={{color:"gray"}}>sunday 26 ;dasd</Text>
-              </View>
-            </View>
-          </View>
-          
+          ))}
         </LinearGradient>
-        
       </View>
     </View>
   );
 }
+
 
 const stylessheet = StyleSheet.create({
   container: {
