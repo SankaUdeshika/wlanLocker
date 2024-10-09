@@ -33,6 +33,7 @@ export default function App() {
   const [getHomeList, setHomeList] = useState([]);
   const [getUserLockStatus, setUserLockStatus] = useState("");
   const [getMainLockStatus, setMainLockStatus] = useState("");
+  const [getLoggedUserName, setLoggedUserName] = useState("");
 
   useEffect(() => {
     if (loaded || error) {
@@ -44,6 +45,7 @@ export default function App() {
     async function LoadLockUserStatus() {
       let userJson = await AsyncStorage.getItem("user");
       let userObject = JSON.parse(userJson);
+      setLoggedUserName(userObject.name);
 
       let response = await fetch(
         process.env.EXPO_PUBLIC_URL +
@@ -118,7 +120,7 @@ export default function App() {
           </View>
           <View style={stylessheet.profileDetails}>
             <Text style={stylessheet.noramlText}> Welcome</Text>
-            <Text style={stylessheet.WelcomeText}> Sanka Udeshika</Text>
+            <Text style={stylessheet.WelcomeText}> {getLoggedUserName} </Text>
           </View>
         </View>
       </View>
